@@ -10,29 +10,6 @@
   let activeNote = {}; // activeNote is used to keep track of the note in the textarea
 
 //----------------------------------------------------------------------------------------------------------------------
-// DEFINE EVENT HANDLERS
-//----------------------------------------------------------------------------------------------------------------------
-
-  // (FOR TESTING) Console log the current pathname when a page is opened
-  console.log(location.pathname);
-
-  // If the user is on the notes page, get the elemenets and assign them to variables for use in program
-  if (window.location.pathname === '/Public/HTML/notes') {
-    noteTitle = document.querySelector('.note-title');
-    noteText = document.querySelector('.note-textarea');
-    saveNoteBtn = document.querySelector('.save-note');
-    newNoteBtn = document.querySelector('.new-note');
-    noteList = document.querySelectorAll('.list-container .list-group');
-  }
-
-  // If the user is on the notes page, add event listners to the appropriate elemenets
-  if (window.location.pathname === '/Public/HTML/notes') {
-    saveNoteBtn.addEventListener('click', handleNoteSave);
-    newNoteBtn.addEventListener('click', handleNewNoteView);
-    noteTitle.addEventListener('keyup', handleRenderSaveBtn);
-    noteText.addEventListener('keyup', handleRenderSaveBtn);
-  }
-//----------------------------------------------------------------------------------------------------------------------
 // DEFINE FUNCTIONS TO BE INVOKED UPON PROGRAM SEQUENCE INIT
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -48,7 +25,7 @@
 
   // Function used to Get notes from Server (GET)
   const getNotes = () =>
-    fetch('/api/notes', {
+    fetch('/api/data', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -76,16 +53,35 @@
 
   // Function used to Render Active Notes
   const renderActiveNote = () => {
+    
+    // Console log for TESTING
+    console.log(`renderActiveNote invoked`);
+
+    // Hide the save button
     hide(saveNoteBtn);
 
+    // If the active note has an ID...
     if (activeNote.id) {
+      console.log("if block in renderActiveNote invoked");
+
+      // Set the noteTitle attribute to readonly
       noteTitle.setAttribute('readonly', true);
+
+      // Set the noteText attribute to readonline
       noteText.setAttribute('readonly', true);
+
+      // Set the noteTitle value to the title of the active note..
       noteTitle.value = activeNote.title;
+
+      // Set the noteText value to the text of the active note...
       noteText.value = activeNote.text;
-    } else {
-      noteTitle.value = '';
-      noteText.value = '';
+    } 
+
+    // Else if the active note has no ID set the values of title and text to blank strings...
+    else {
+      console.log("else block in renderActive Note invoked");
+      noteTitle.value = 'Blank';
+      noteText.value = 'Blank';
     }
   };
 
@@ -122,8 +118,17 @@
 
   // Function that sets the activeNote and displays it
   const handleNoteView = (e) => {
+
+    // Console log for testing
+    console.log(`handleNoteView function invoked`);
+
+    // Prevent Default
     e.preventDefault();
+
+    // Set active note the value of data-note attribute which includes both title and text from the note object...
     activeNote = JSON.parse(e.target.parentElement.getAttribute('data-note'));
+
+    // Invoke the render Active Note function
     renderActiveNote();
   };
 
@@ -133,7 +138,7 @@
     renderActiveNote();
   };
 
-  // Function that hides the save button if no text or titele exists
+  // Function that hides the save button if no text or title exists
   const handleRenderSaveBtn = () => {
     if (!noteTitle.value.trim() || !noteText.value.trim()) {
       hide(saveNoteBtn);
@@ -142,28 +147,54 @@
     }
   };
 
-  // Function used to render the list of note titles
+  // Function used to render the list of note titles. Takes the response to the get notes fetch and Returns a promise since we use async in front of it...
   const renderNoteList = async (notes) => {
+
+    // Console Log for testing
+    console.log(`renderNoteList function invoked`);
+
+    // Declare jsonNotes as the parsed value of the response received from get notes (all the json objects in the array)..
     let jsonNotes = await notes.json();
+    console.log("jsonNotes variable value below as declared in render NoteList function");
+    console.log(jsonNotes);
+
+    // If I am on the /notes, make my list of notes blank
     if (window.location.pathname === '/notes') {
       noteList.forEach((el) => (el.innerHTML = ''));
     }
 
+    // Make sure my note list array is empty
     let noteListItems = [];
 
-    // Returns HTML element with or without a delete button
+    // Returns HTML element with or without a delete button. "text" is passed in as an argument when this is invoked on line 223
     const createLi = (text, delBtn = true) => {
+      console.log(text);
+
+      // Create a variable representing a new list item element
       const liEl = document.createElement('li');
+
+      // Add the list-group-item class to this element
       liEl.classList.add('list-group-item');
 
+      // Create a vairbale representing a new span elemenet (that will hold the title of the note)
       const spanEl = document.createElement('span');
+
+      // Set the innter text of that elemenet equal to Note title (not sure why this is text)
       spanEl.innerText = text;
+
+      // Add a listner so that when the span button is clicked, it triggers the handle Note View
       spanEl.addEventListener('click', handleNoteView);
 
+      // Append the created span element to the created list element
       liEl.append(spanEl);
 
+      // If delete button is true...
       if (delBtn) {
+
+        // Create a variable representing a new icon elemenet
         const delBtnEl = document.createElement('i');
+
+        // Add the classes below to it so it renders per availible from font awesome cdn..
         delBtnEl.classList.add(
           'fas',
           'fa-trash-alt',
@@ -171,38 +202,97 @@
           'text-danger',
           'delete-note'
         );
+
+        // Add an event listner so that click of delete button invokes handle Delete function
         delBtnEl.addEventListener('click', handleNoteDelete);
 
+        // append the elemenet to the list elemenet
         liEl.append(delBtnEl);
       }
 
       return liEl;
     };
 
+    // If there is no json note (nothing in the response), push a message no saved notes to the noteListItems Array...
     if (jsonNotes.length === 0) {
       noteListItems.push(createLi('No saved Notes', false));
     }
 
+    // For each array item recieved in the response (which I parsed and made equal to jsonNotes)...
     jsonNotes.forEach((note) => {
-      const li = createLi(note.title);
-      li.dataset.note = JSON.stringify(note);
 
+      // Create a list element by passing in the response.title...
+      const li = createLi(note.title);
+
+      // Use the .dataset api to set a data-note attribute to the respones (JSON) received in the initial get request... So the title, and the text in an object
+      li.dataset.note = JSON.stringify(note);
+      console.log (`The data-note attribute set on line 226 is ${li.dataset.note}`);
+
+      // Push this newly created list item into the noteListItems array. The list item has a data-note attribute including the title and text of the object.
       noteListItems.push(li);
     });
 
+    // If we are on the notes page, loop through the noteListItems array and append each item into the noteList
     if (window.location.pathname === '/notes') {
       noteListItems.forEach((note) => noteList[0].append(note));
     }
   };
 
   // Gets notes from the db and renders them to the sidebar
-  const getAndRenderNotes = () => getNotes().then(renderNoteList);
+  const getAndRenderNotes = () => {
+    console.log(`getAndRender notes function invoked`);
+    getNotes().then(renderNoteList);
+  }
+
+//----------------------------------------------------------------------------------------------------------------------
+// DEFINE EVENT HANDLERS
+//----------------------------------------------------------------------------------------------------------------------
+
+  // (FOR TESTING) Console log the current pathname when a page is opened
+  console.log(location.pathname);
+
+  // If the user is on the notes page, get the elemenets and assign them to variables for use in program
+  if (window.location.pathname === '/notes') {
+    noteTitle = document.querySelector('.note-title');
+    noteText = document.querySelector('.note-textarea');
+    saveNoteBtn = document.querySelector('.save-note');
+    newNoteBtn = document.querySelector('.new-note');
+    noteList = document.querySelectorAll('.list-container .list-group');
+  }
+
+  // If the user is on the notes page, add event listners to the appropriate elemenets
+  if (window.location.pathname === '/notes') {
+    saveNoteBtn.addEventListener('click', handleNoteSave);
+    newNoteBtn.addEventListener('click', handleNewNoteView);
+    noteTitle.addEventListener('keyup', handleRenderSaveBtn);
+    noteText.addEventListener('keyup', handleRenderSaveBtn);
+  }
 
 //----------------------------------------------------------------------------------------------------------------------
 // DEFINE PROGRAM SEQUENCE
 //----------------------------------------------------------------------------------------------------------------------
 
+  // (DONE WITH SERVER) When the user searches the page (opens the application)... get and display the landing page from the server...
+    // This is done at the server level. / will direct server to return landing page
+
+  // (DONE WITH SERVER) Once the user clicks the "Get started button", request the notes HTML page from the server...
+    // This is done in the HTML & Server. GEt started button has a /notes attribute, and /notes path on server specifiese to return notes page with static elements it uses
+
+  // Once the notes page is displayed, get and render any existing notes from the server in the left hand column...
+    getAndRenderNotes();
+
+  // If a user clicks on a saved note (in the left hand column), display the note title and text in the main window...
+
+  // If a user clicks on the pencil icon, let them create a new note...
+
+  // Once a user is enting a new note, show the save button...
+
+  // When a user saves a note, send it back to the server...
+
+  
+
+  // If a user clicks on the delete button, delete that note from the server...
 
 
 
-//getAndRenderNotes();
+
