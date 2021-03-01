@@ -23,17 +23,7 @@
 // DEFINE FUNCTIONS TO BE INVOKED UPON PROGRAM SEQUENCE INIT
 //----------------------------------------------------------------------------------------------------------------------
 
-  // API CALLS----------------------------------------------------------------------------------------------------------
-
-    // Function to Show An Element 
-    const show = (elem) => {
-      elem.style.display = 'inline';
-    };
-
-    // Function to Hide and Element
-    const hide = (elem) => {
-      elem.style.display = 'none';
-    };
+  // FUNCTIONS FOR API CALLS--------------------------------------------------------------------------------------------
 
     // Function used to Get notes from Server (GET)
     const getNotes = () =>
@@ -46,7 +36,7 @@
 
     //Functoin Used to Save Notes to Server (POST)
     const saveNote = (note) =>
-      fetch('/api/notes', {
+      fetch('/api/data/post', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -62,8 +52,20 @@
           'Content-Type': 'application/json',
         },
     });
+  
+  // FUNCTIONS FOR DISPLAY STATE-----------------------------------------------------------------------------------------
 
-  // FUNCTIONS FOR HANDLING BUTTON CLICKS AND LOCATION IFS---------------------------------------------------------------
+    // Function to Show An Element 
+     const show = (elem) => {
+      elem.style.display = 'inline';
+    };
+
+    // Function to Hide and Element
+    const hide = (elem) => {
+      elem.style.display = 'none';
+    };
+
+  // FUNCTIONS FOR HANDLING AND RENDERING NOTE VIEWS OR INSTRUCTINS-------------------------------------------------------
 
     // Function used to Render Active Notes (Active note may be prior saved note, or new note in progress...)
     const renderActiveNote = () => {
@@ -74,7 +76,7 @@
       // Hide the save button
       hide(saveNoteBtn);
 
-      // If the active note has an ID (implying it already exists)...
+      // If the active note has an ID (implying it already exists) make it read only and set the title / text of the saved item
       if (activeNote.id) {
         console.log("if block in renderActiveNote invoked");
 
@@ -91,7 +93,7 @@
         noteText.value = activeNote.text;
       } 
 
-      // Else if the active note has no ID set the values of title and text to blank strings...
+      // Else if the active note has no ID set the values of title and text to blank strings and remove read-only attribtue...
       else {
         noteTitle.removeAttribute('readonly');
         noteText.removeAttribute('readonly');
@@ -262,13 +264,11 @@
     }
 
 //----------------------------------------------------------------------------------------------------------------------
-// DEFINE EVENT HANDLERS
+// DEFINE EVENT LISTNERS
 //----------------------------------------------------------------------------------------------------------------------
 
   // (FOR TESTING) Console log the current pathname when a page is opened
   console.log(location.pathname);
-
- 
 
   // If the user is on the notes page, add event listners to the appropriate elemenets
   if (window.location.pathname === '/notes') {
@@ -288,19 +288,19 @@
   // (DONE WITH SERVER) Once the user clicks the "Get started button", request the notes HTML page from the server...
     // This is done in the HTML & Server. GEt started button has a /notes attribute, and /notes path on server specifiese to return notes page with static elements it uses
 
-  // Once the notes page is displayed, get and render any existing notes from the server in the left hand column...
-    getAndRenderNotes();
+  // (STARTS THE PROGRAM LOOP) Once the notes page is displayed, get and render any existing notes from the server in the left hand column...
+     getAndRenderNotes();
 
   // If a user clicks on a saved note (in the left hand column), display the note title and text in the main window...
-    // This is managed in the event listners. Click of new-note button should invoke handle new Note View
+    // This is managed in the event listners. Click on this elemenet triggers handleNoteView, then renderActiveNote function
 
   // If a user clicks on the pencil icon, let them create a new note...
+    // This is managed in the event listners. Click of the pencil invokes handle note view and render active note...
 
   // Once a user is enting a new note, show the save button...
+    // This is handled in the renderActiveNote function once invoked
 
-  // When a user saves a note, send it back to the server...
-
-  
+  // When a user saves a note, send it back to the server via POST method...
 
   // If a user clicks on the delete button, delete that note from the server...
 

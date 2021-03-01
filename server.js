@@ -1,6 +1,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // IMPORT DEPENDENCIES
 //----------------------------------------------------------------------------------------------------------------------
+    // Require Express and Path
     const express = require('express');
     const path = require ('path');
 
@@ -16,17 +17,16 @@
     let public = path.join(__dirname, "Public")
     app.use(express.static(public));
 
-    // Setup the Express app to handle data parsing
-    app.use(express.urlencoded({extended: true}));
-    app.use(express.json());
-
 //----------------------------------------------------------------------------------------------------------------------
 // DEFINE MIDDLEWARE
 //----------------------------------------------------------------------------------------------------------------------
-    // Enter middleware here?
+    
+    // Setup the Express app to handle data parsing
+     app.use(express.urlencoded({extended: true}));
+     app.use(express.json());
 
 //----------------------------------------------------------------------------------------------------------------------
-// DEFINE ROUTES
+// DEFINE ROUTES & REQ HANDLER FUNCTIONS
 //----------------------------------------------------------------------------------------------------------------------
 
     // Create initial routes that sends user to the landing page
@@ -41,10 +41,22 @@
     })
 
     // Create a route that allows for the posting of saved notes
-    
-   
+    app.get('/api/data/post', (req, res) => {
 
-    // Create a route that allows 
+        // Console log the request
+        console.log(req);
+
+        // Take the Request (that should be parsed already by middlware) and define it as a variable
+
+        // Create a unique ID and add it as a property to the object...
+
+        // Append it to the array of JSON objects...
+
+        // Finally, send the updated database with new info back to it
+        res.sendFile(path.join(__dirname, "/Data/data.json"))
+    })
+   
+    // Create a route that allows for the deleting of data...
 
 //----------------------------------------------------------------------------------------------------------------------
 // START THE SERVER AND BEGIN LISTNING ON SPECIFIED PORT
