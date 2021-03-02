@@ -1,7 +1,1 @@
-[
-    {
-        "title":"Title Test in JSON DB",
-        "text":"Text Test in JSON DB",
-        "id":"Test ID in JSON DB"
-    }
-]
+[{"title":"title","text":"text","id":"id"},{"title":"Fishing","text":"Fishing for notes","id":"6f059935-c08f-4986-9dc0-b747cc2da53c"},{"title":"Cow","text":"Cow","id":"db2245bd-225d-4473-8192-fbdd9211b11b"},{"title":"Chicken","text":"chicken","id":"8bc354a9-8212-415a-84ab-36070af10b9f"},{"title":"Beef","text":"Beef","id":"7fabf2cd-d905-4f8e-bd18-2074a8694ef5"}]

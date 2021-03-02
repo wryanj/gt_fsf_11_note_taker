@@ -1,9 +1,15 @@
 //----------------------------------------------------------------------------------------------------------------------
-// IMPORT DEPENDENCIES
+// IMPORT DEPENDENCIES & DEFINE GLOBAL VARIABLES
 //----------------------------------------------------------------------------------------------------------------------
-    // Require Express and Path
+    // Import libraries
     const express = require('express');
     const path = require ('path');
+    const {v4: uuidv4} = require('uuid');
+    const fs = require('fs');
+
+    // Define global variables
+    let updatedJson;
+   
 
 //----------------------------------------------------------------------------------------------------------------------
 // SETUP EXPRESS
@@ -21,7 +27,7 @@
 // DEFINE MIDDLEWARE
 //----------------------------------------------------------------------------------------------------------------------
     
-    // Setup the Express app to handle data parsing
+    // Setup the Express app to parse incoming posts to JSON
      app.use(express.urlencoded({extended: true}));
      app.use(express.json());
 
@@ -41,21 +47,48 @@
     })
 
     // Create a route that allows for the posting of saved notes
-    app.get('/api/data/post', (req, res) => {
+    app.post('/api/data/post', (req, res) => {
 
-        // Console log the request
-        console.log(req);
-
-        // Take the Request (that should be parsed already by middlware) and define it as a variable
+        // Take the request from the client(that should be the new note parsed already by middlware) and define it as a variable
+        let newNote = req.body;
+        console.log (`new note as read from the request body is set to value: ${JSON.stringify(newNote)} with type ${typeof newNote}`);
 
         // Create a unique ID and add it as a property to the object...
+        newNote.id = uuidv4();
+        console.log (`new note updated with UUI is set to value:  ${JSON.stringify(newNote)} with type ${ typeof newNote}`);
 
-        // Append it to the array of JSON objects...
+        // Read in the current JSON file and update it with the newly recieved note
+        fs.readFile("./Data/data.json", "utf-8", (err, data) => {
+        
+            //If error, throw error
+            if (err) throw err;
 
-        // Finally, send the updated database with new info back to it
-        res.sendFile(path.join(__dirname, "/Data/data.json"))
+            // Capture that parsed data into a named constant
+            const readJson = JSON.parse(data);
+                console.log(readJson);
+
+            //Push the new note (which is already parsed with middleware) into the readJSON
+            readJson.push(newNote);
+
+            // Set the updated array to a global varialbe for access in the write file function
+            updatedJson = readJson;
+                console.log(updatedJson);
+            
+            writeData();
+        })
+
+        // Then, send the new data back by writing the updated JSON back to data.json - HAVING PROBLEMS HERE. Variable undefined when i try outside readfile. why? Sync also does not work
+        function writeData () {
+            console.log(updatedJson);
+            fs.writeFile("./Data/data.json", JSON.stringify(updatedJson), (err) => {
+                if (err) throw err;
+                console.log("success");
+            })
+        }
+       
     })
-   
+
+    
     // Create a route that allows for the deleting of data...
 
 //----------------------------------------------------------------------------------------------------------------------

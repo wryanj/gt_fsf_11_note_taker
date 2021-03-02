@@ -34,7 +34,7 @@
         },
     });
 
-    //Functoin Used to Save Notes to Server (POST)
+    // Function Used to Save Notes to Server (POST)
     const saveNote = (note) =>
       fetch('/api/data/post', {
         method: 'POST',
