@@ -14,9 +14,11 @@
 // SETUP EXPRESS
 //----------------------------------------------------------------------------------------------------------------------
 
-    // Setup the Express App & Define A Port To Listen Through
+    // Setup the Express App 
     const app = express();
-    const PORT = "8080";
+
+    // Define port in way that enables heroku also. Here we say "either use this port provided by heroku, or if null, use 8080 (if I'm testing locally for example)"
+    const PORT = process.env.PORT || 8080;
 
     // Setup the Express app to handle static files (ensures my html can get the client logic and CSS to use within my public folder)
     let public = path.join(__dirname, "Public")
@@ -34,7 +36,7 @@
 // DEFINE ROUTES & REQ HANDLER FUNCTIONS
 //----------------------------------------------------------------------------------------------------------------------
 
-    // Create initial routes that sends user to the landing page
+    // Create initial routes that sends user to the landing page (base route)
     app.get('/', (req, res) => res.sendFile(path.join(__dirname,"Public")));
 
     // Create a route that sends the user to the note taking page
