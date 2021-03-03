@@ -84,8 +84,16 @@
                 if (err) throw err;
                 console.log("success");
             })
+
+            // When this is done send the response
+            sendResponse();
         }
        
+        // Send the response when called after data is written. 
+        function sendResponse () {
+            res.sendStatus(200);
+        }
+      
     })
 
     

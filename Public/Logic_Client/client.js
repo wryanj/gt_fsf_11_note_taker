@@ -131,7 +131,8 @@
       deleteNote(noteId).then(() => {
         getAndRenderNotes();
         renderActiveNote();
-      });
+        
+      }).catch(err=>console.error(err));
     };
 
     // Function that sets the activeNote and displays it
