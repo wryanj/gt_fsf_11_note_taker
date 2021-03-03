@@ -8,9 +8,8 @@
     const fs = require('fs');
 
     // Define global variables
-    let updatedJson;
+    let updatedJson; // Variable is set in post route read functoin, used in fs write function
    
-
 //----------------------------------------------------------------------------------------------------------------------
 // SETUP EXPRESS
 //----------------------------------------------------------------------------------------------------------------------
@@ -28,8 +27,8 @@
 //----------------------------------------------------------------------------------------------------------------------
     
     // Setup the Express app to parse incoming posts to JSON
-     app.use(express.urlencoded({extended: true}));
-     app.use(express.json());
+    app.use(express.urlencoded({extended: true}));
+    app.use(express.json());
 
 //----------------------------------------------------------------------------------------------------------------------
 // DEFINE ROUTES & REQ HANDLER FUNCTIONS
@@ -51,11 +50,9 @@
 
         // Take the request from the client(that should be the new note parsed already by middlware) and define it as a variable
         let newNote = req.body;
-        console.log (`new note as read from the request body is set to value: ${JSON.stringify(newNote)} with type ${typeof newNote}`);
 
         // Create a unique ID and add it as a property to the object...
         newNote.id = uuidv4();
-        console.log (`new note updated with UUI is set to value:  ${JSON.stringify(newNote)} with type ${ typeof newNote}`);
 
         // Read in the current JSON file and update it with the newly recieved note
         fs.readFile("./Data/data.json", "utf-8", (err, data) => {
@@ -65,23 +62,27 @@
 
             // Capture that parsed data into a named constant
             const readJson = JSON.parse(data);
-                console.log(readJson);
 
             //Push the new note (which is already parsed with middleware) into the readJSON
             readJson.push(newNote);
 
             // Set the updated array to a global varialbe for access in the write file function
             updatedJson = readJson;
-                console.log(updatedJson);
             
+            // When finished with this, call the functoin to write data
             writeData();
         })
 
-        // Then, send the new data back by writing the updated JSON back to data.json - HAVING PROBLEMS HERE. Variable undefined when i try outside readfile. why? Sync also does not work
+        // Then, send the new data back by writing the updated JSON back to data.json 
         function writeData () {
-            console.log(updatedJson);
+
+            // Write my updated array into the data.json file
             fs.writeFile("./Data/data.json", JSON.stringify(updatedJson), (err) => {
+
+                // If there is an error throw an error message
                 if (err) throw err;
+
+                // If things worked, console log success
                 console.log("success");
             })
 
@@ -89,14 +90,13 @@
             sendResponse();
         }
        
-        // Send the response when called after data is written. 
+        // Send the response when called after data is written which reolves the promise of client call, allowing further progression of function calls 
         function sendResponse () {
             res.sendStatus(200);
         }
       
     })
 
-    
     // Create a route that allows for the deleting of data...
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -44,7 +44,7 @@
         body: JSON.stringify(note),
     });
 
-    //Function used to Delete Notes
+    //Function used to Delete Notes (DELETE)
     const deleteNote = (id) =>
       fetch(`/api/notes/${id}`, {
         method: 'DELETE',
@@ -70,16 +70,12 @@
     // Function used to Render Active Notes (Active note may be prior saved note, or new note in progress...)
     const renderActiveNote = () => {
       
-      // Console log for TESTING
-      console.log(`renderActiveNote invoked`);
-
       // Hide the save button
       hide(saveNoteBtn);
 
-      // If the active note has an ID (implying it already exists) make it read only and set the title / text of the saved item
+      // If the active note has an ID (implying it already exists in the DB) make it read only and set the title / text of the saved item
       if (activeNote.id) {
-        console.log("if block in renderActiveNote invoked");
-
+  
         // Set the noteTitle attribute to readonly
         noteTitle.setAttribute('readonly', true);
 
@@ -93,53 +89,50 @@
         noteText.value = activeNote.text;
       } 
 
-      // Else if the active note has no ID set the values of title and text to blank strings and remove read-only attribtue...
+      // Else if the active note has no ID set the values of title and text to blank strings and remove read-only attribtue so it can be edited...
       else {
         noteTitle.removeAttribute('readonly');
         noteText.removeAttribute('readonly');
         noteTitle.value = "";
         noteText.value = "";
       }
+
     };
 
-    // When the save-note button is clicked, this begins the process to save the note...
+    // Functoin used to save note...
     const handleNoteSave = () => {
-      console.log("handleNoteSave function invoked");
+
+      // Create a new note object and set its title ant text as properties
       const newNote = {
         title: noteTitle.value,
         text: noteText.value,
       };
+
+      // Save the new note, then when a response is received get and render all notes in the left hand column
       saveNote(newNote).then(() => {
         getAndRenderNotes();
         renderActiveNote();
       });
+
     };
 
     // Function to handle the deletion of notes
     const handleNoteDelete = (e) => {
-
       // Note: This prevents the click listener for the list from being called when the button inside of it is clicked
       e.stopPropagation();
-
       const note = e.target;
       const noteId = JSON.parse(note.parentElement.getAttribute('data-note')).id;
-
       if (activeNote.id === noteId) {
         activeNote = {};
       }
-
       deleteNote(noteId).then(() => {
         getAndRenderNotes();
         renderActiveNote();
-        
       }).catch(err=>console.error(err));
     };
 
-    // Function that sets the activeNote and displays it
+    // Function that handles viewing of the active note
     const handleNoteView = (e) => {
-
-      // Console log for testing
-      console.log(`handleNoteView function invoked`);
 
       // Prevent Default
       e.preventDefault();
@@ -153,9 +146,13 @@
 
     // Function that sets the activeNote to and empty object and allows the user to enter a new note
     const handleNewNoteView = (e) => {
-      console.log("handleNewNoteView functoin invoked");
+
+      // Set the active note to empty
       activeNote = {};
+
+      // Render the blank note to the screen
       renderActiveNote();
+
     };
 
     // Function that hides the save button if no text or title exists
@@ -167,16 +164,11 @@
       }
     };
 
-    // Function used to render the list of note titles. Takes the response to the get notes fetch and Returns a promise since we use async in front of it...
+    // Function used to render the list of note titles. Takes the response to the get notes fetch and displays the notes
     const renderNoteList = async (notes) => {
-
-      // Console Log for testing
-      console.log(`renderNoteList function invoked`);
 
       // Declare jsonNotes as the parsed value of the response received from get notes (all the json objects in the array)..
       let jsonNotes = await notes.json();
-      console.log("jsonNotes variable value below as declared in render NoteList function");
-      console.log(jsonNotes);
 
       // If I am on the /notes, make my list of notes blank
       if (window.location.pathname === '/notes') {
@@ -188,7 +180,6 @@
 
       // Returns HTML element with or without a delete button. "text" is passed in as an argument when this is invoked on line 223
       const createLi = (text, delBtn = true) => {
-        console.log(text);
 
         // Create a variable representing a new list item element
         const liEl = document.createElement('li');
@@ -246,7 +237,6 @@
 
         // Use the .dataset api to set a data-note attribute to the respones (JSON) received in the initial get request... So the title, and the text in an object
         li.dataset.note = JSON.stringify(note);
-        console.log (`The data-note attribute set on line 226 is ${li.dataset.note}`);
 
         // Push this newly created list item into the noteListItems array. The list item has a data-note attribute including the title and text of the object.
         noteListItems.push(li);
@@ -256,20 +246,17 @@
       if (window.location.pathname === '/notes') {
         noteListItems.forEach((note) => noteList[0].append(note));
       }
+
     };
 
     // Gets notes from the db and renders them to the sidebar
     const getAndRenderNotes = () => {
-      console.log(`getAndRender notes function invoked`);
       getNotes().then(renderNoteList);
     }
 
 //----------------------------------------------------------------------------------------------------------------------
 // DEFINE EVENT LISTNERS
 //----------------------------------------------------------------------------------------------------------------------
-
-  // (FOR TESTING) Console log the current pathname when a page is opened
-  console.log(location.pathname);
 
   // If the user is on the notes page, add event listners to the appropriate elemenets
   if (window.location.pathname === '/notes') {
