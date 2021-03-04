@@ -105,7 +105,6 @@
 
        // Deconstruct the req.param and set it equal to a variable type id...
         const {id} = req.params;
-            console.log(id);
 
         // Read in the existing JSON file containing the array of notes, and delete the note matching this id
         fs.readFile("./Data/data.json", "utf-8", (err, data) => {
@@ -115,7 +114,6 @@
 
             // Capture that parsed data into a named constant
             const readJson = JSON.parse(data);
-                console.log(readJson);
 
             // Delete the note with the id passed in above from the readjson
 
@@ -123,18 +121,14 @@
                 const deleteMeIndex = readJson.findIndex(function(item){
                     return item.id === id;
                 })
-                console.log(`array item Index targeted to delete is ${deleteMeIndex}`);
-                console.log(`array item targeted to delete is ${JSON.stringify(readJson[deleteMeIndex])}`);
-
-
+    
                 // Remove object with that id
+
                     // This line of code takes teh readjson file, and returns only the item that I want to DELETE
                     readJson.splice(deleteMeIndex,1);
 
                     // What remains in the readJSON constant is now everything else, besides the thing I deleted. I set it equal to updated JSON for readability
                     updatedJson = readJson;
-                    console.log("readJson is that shoudl remain after deletion is" + JSON.stringify(updatedJson));
-                    console.log(typeof updatedJson);
                 
                 // Write data by invoking tha tfunction
                 writeData();
@@ -163,6 +157,7 @@
             res.sendStatus(200);
         }
     })
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // START THE SERVER AND BEGIN LISTNING ON SPECIFIED PORT
