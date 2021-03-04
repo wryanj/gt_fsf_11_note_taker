@@ -9,6 +9,7 @@
 
     // Define global variables
     let updatedJson; // Variable is set in post route read functoin, used in fs write function
+
    
 //----------------------------------------------------------------------------------------------------------------------
 // SETUP EXPRESS
@@ -100,6 +101,68 @@
     })
 
     // Create a route that allows for the deleting of data...
+    app.delete('/api/data/delete/:id', (req, res) => {
+
+       // Deconstruct the req.param and set it equal to a variable type id...
+        const {id} = req.params;
+            console.log(id);
+
+        // Read in the existing JSON file containing the array of notes, and delete the note matching this id
+        fs.readFile("./Data/data.json", "utf-8", (err, data) => {
+        
+            //If error, throw error
+            if (err) throw err;
+
+            // Capture that parsed data into a named constant
+            const readJson = JSON.parse(data);
+                console.log(readJson);
+
+            // Delete the note with the id passed in above from the readjson
+
+                // Get index of object with id that was passed in
+                const deleteMeIndex = readJson.findIndex(function(item){
+                    return item.id === id;
+                })
+                console.log(`array item Index targeted to delete is ${deleteMeIndex}`);
+                console.log(`array item targeted to delete is ${JSON.stringify(readJson[deleteMeIndex])}`);
+
+
+                // Remove object with that id
+                    // This line of code takes teh readjson file, and returns only the item that I want to DELETE
+                    readJson.splice(deleteMeIndex,1);
+
+                    // What remains in the readJSON constant is now everything else, besides the thing I deleted. I set it equal to updated JSON for readability
+                    updatedJson = readJson;
+                    console.log("readJson is that shoudl remain after deletion is" + JSON.stringify(updatedJson));
+                    console.log(typeof updatedJson);
+                
+                // Write data by invoking tha tfunction
+                writeData();
+            
+        })
+
+        // Then, send the new data back by writing the updated JSON back to data.json 
+        function writeData () {
+
+            // Write my updated array into the data.json file
+            fs.writeFile("./Data/data.json", JSON.stringify(updatedJson), (err) => {
+
+                // If there is an error throw an error message
+                if (err) throw err;
+
+                // If things worked, console log success
+                console.log("success");
+            })
+
+            // When this is done send the response
+            sendResponse();
+        }
+        
+        // Send the response when called after data is written which reolves the promise of client call, allowing further progression of function calls 
+        function sendResponse () {
+            res.sendStatus(200);
+        }
+    })
 
 //----------------------------------------------------------------------------------------------------------------------
 // START THE SERVER AND BEGIN LISTNING ON SPECIFIED PORT

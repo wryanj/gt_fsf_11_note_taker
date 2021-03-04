@@ -46,7 +46,7 @@
 
     //Function used to Delete Notes (DELETE)
     const deleteNote = (id) =>
-      fetch(`/api/notes/${id}`, {
+      fetch(`/api/data/delete/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -291,7 +291,6 @@
   // When a user saves a note, send it back to the server via POST method...
 
   // If a user clicks on the delete button, delete that note from the server...
-
 
 
 
